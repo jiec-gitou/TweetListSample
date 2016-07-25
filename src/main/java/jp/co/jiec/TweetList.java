@@ -1,7 +1,10 @@
 package jp.co.jiec;
 
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,11 +14,14 @@ import javax.enterprise.inject.New;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import twitter4j.HashtagEntity;
 import twitter4j.Query;
 import twitter4j.Status;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
+import twitter4j.URLEntity;
+import twitter4j.UserMentionEntity;
 
 /**
  * ツイートのリスト
@@ -37,18 +43,21 @@ public class TweetList implements Serializable {
 	private TwitterFactory tf;
 	
 	@PostConstruct
-	public void init(){
+	public void init() {
+		try {
+			action();
+		} catch (TwitterException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public String getText() {
 		return text.orElse("*");
 	}
 	
-	public void setText(String text) {
-		this.text = Optional.ofNullable(text);
-		if(this.text.orElse("").length() == 0){
-			this.text = Optional.of("*");
-		}
+	public void setText(String text) throws TwitterException {
+		this.text = (text == null || "".equals(text)) ? Optional.of("*") : Optional.of(text);
+		action();
 	}
 	
 	public List<Status> getList() {
@@ -58,20 +67,6 @@ public class TweetList implements Serializable {
 	public void setList(List<Status> list) {
 		this.list.clear();
 		this.list.addAll(list);
-	}
-	
-	public String getHash(){
-		return this.text.orElse("*");
-	}
-	
-	/**
-	 * 検索用ハッシュの設定
-	 * @param hash
-	 * @throws TwitterException
-	 */
-	public void setHash(String hash) throws TwitterException {
-		this.text = Optional.of("#" + hash);
-		this.action();
 	}
 	
 	public String getUserID(){
@@ -86,6 +81,10 @@ public class TweetList implements Serializable {
 	public void setUserID(String id) throws TwitterException {
 		this.text = Optional.of("@" + id);
 		action("@" + id);
+	}
+	
+	public String send(){
+		return "?text=" + this.getText();
 	}
 	
 	/**
@@ -118,5 +117,37 @@ public class TweetList implements Serializable {
 		}
 		Twitter twitter = tf.getInstance();
 		this.setList(twitter.getUserTimeline(id));
+	}
+	
+	private String toURLString(String origin, String url){
+		return toURLString(origin, url, url);
+	}
+	private String toURLString(String origin, String target, String url){
+		return origin.replaceAll(target, "&nbsp;<a href=\"" + url + "\">"+ target + "</a>");
+	}
+	public String formatFor(Status status) throws UnsupportedEncodingException{
+		String result = status.getText().replaceFirst(" +[A-z0-9\\:\\/\\#\\.]*… ?$", "");
+		for(UserMentionEntity user : status.getUserMentionEntities()){
+			result = toURLString(result, "@" + user.getScreenName(), "?userID=" + user.getScreenName());
+		}
+		for(HashtagEntity tag : status.getHashtagEntities()){
+			if(!result.contains("#" + tag.getText())){
+				result += "&nbsp;<a href=\"?text=#" + tag.getText() + "\">" + URLEncoder.encode("#" + tag.getText(), "UTF-8") + "</a>";
+			}else{
+				result = toURLString(result, "#" + tag.getText(), "?text=" + URLEncoder.encode("#" + tag.getText(), "UTF-8"));
+			}
+		}
+		
+		List<URLEntity> urls = new ArrayList<>();
+		Collections.addAll(urls, status.getURLEntities());
+		Collections.addAll(urls, status.getMediaEntities());
+		for(URLEntity entity : urls){
+			if(!result.contains(entity.getURL())){
+				result += "&nbsp;<a href=\"" + entity.getURL() + "\">" + entity.getURL() + "</a>";
+			}else{
+				result = toURLString(result, entity.getURL());
+			}
+		}
+		return result;
 	}
 }

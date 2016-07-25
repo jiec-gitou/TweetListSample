@@ -6,7 +6,7 @@
     xmlns:ui="http://java.sun.com/jsf/facelets"
     xmlns:h="http://java.sun.com/jsf/html" lang="ja">
 <f:metadata>
-	<f:viewParam id="hash" name="hash" value="#{tweetList.hash}" />
+	<f:viewParam id="text" name="text" value="#{tweetList.text}" />
 </f:metadata>
 <f:metadata>
 	<f:viewParam id="userID" name="userID" value="#{tweetList.userID}" />
@@ -23,36 +23,17 @@
     	<ui:repeat value="#{tweetList.list}" var="status">
     		<i><h:outputText value="#{status.createdAt}"><f:convertDateTime pattern="yyyy年MM月dd日 HH時mm分ss秒" timeZone="JST"/></h:outputText></i>
 			<h:graphicImage url="#{status.user.miniProfileImageURL}"/>
-    		<b>【<h:link outcome="index" value="#{status.user.screenName}">
+    		<b>【<h:link value="#{status.user.screenName}">
     			<f:param id="fname" name="userID" value="#{status.user.screenName}"/>
-    		</h:link>】</b>
-    		#{status.text}&nbsp;
-	    	<ui:repeat value="#{status.hashtagEntities}" var="hashtag">
-	    		<h:link outcome="index" value="##{hashtag.text} ">
-	    			<f:param id="fname" name="hash" value="#{hashtag.text}"/>
-	    		</h:link>
-	    		&nbsp;
-	    	</ui:repeat>
-	    	<ui:repeat value="#{status.userMentionEntities}" var="mention">
-	    		<h:link outcome="index" value="@#{mention.screenName} ">
-	    			<f:param id="fname" name="userID" value="#{mention.screenName}"/>
-	    		</h:link>
-	    		&nbsp;
-	    	</ui:repeat>
-	    	<ui:repeat value="#{status.URLEntities}" var="url">
-	    		<h:outputLink target="_blank" value="#{url.URL}">http://#{url.displayURL}&nbsp;</h:outputLink>
-	    	</ui:repeat>
-	    	<ui:repeat value="#{status.mediaEntities}" var="media">
-	    		<h:outputLink target="_blank" value="#{media.URL}">http://#{media.displayURL}&nbsp;</h:outputLink>
-	    	</ui:repeat>
-	    	<ui:repeat value="#{status.extendedMediaEntities}" var="media">
-	    		<h:outputLink target="_blank" value="#{media.URL}">http://#{media.displayURL}&nbsp;</h:outputLink>
-	    	</ui:repeat>
+    		</h:link></b>
+    		&nbsp;from <small><h:outputText value="#{status.source}" escape="false"/></small>
+    		<b>】</b>&nbsp;
+			<h:outputText value="#{tweetList.formatFor(status)}" escape="false"/>
 	    	<br/>
 		</ui:repeat>
     	<h:form>
 	    	<h:inputText id="word" value="#{tweetList.text}" type="text" class="form-control"/>
-        	<h:commandButton class="btn btn-primary btn-lg btn-block" id="buttonId" value="送信" actionListener="#{tweetList.action}" />
+        	<h:commandButton class="btn btn-primary btn-lg btn-block" id="buttonId" value="送信" action="#{tweetList.send}" />
 	    </h:form>
     </f:view>
 </h:body>
