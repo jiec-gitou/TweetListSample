@@ -1,0 +1,22 @@
+<server>
+
+    <featureManager>
+        <feature>servlet-3.1</feature>
+        <feature>javaee-7.0</feature>
+        <feature>localConnector-1.0</feature>
+    	<feature>cdi-1.2</feature>
+		<feature>el-3.0</feature>
+		<feature>bluemixUtility-1.0</feature>
+		<feature>jsf-2.2</feature>
+		<feature>webProfile-7.0</feature>
+    </featureManager>
+
+    <httpEndpoint id="defaultHttpEndpoint"
+                  host="*"
+                  httpPort="9080">
+        <tcpOptions soReuseAddr="true"/>
+    </httpEndpoint>
+
+    <application name="TweetList" context-root="/" location="${appLocation}" type="war"/>
+
+</server>

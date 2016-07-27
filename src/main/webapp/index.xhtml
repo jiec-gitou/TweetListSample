@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:h="http://java.sun.com/jsf/html" lang="ja">
+<f:metadata>
+	<f:viewParam id="text" name="text" value="#{tweetList.text}" />
+</f:metadata>
+<f:metadata>
+	<f:viewParam id="userID" name="userID" value="#{tweetList.userID}" />
+</f:metadata>
+<h:head>
+	<title>Twitterクライアントのサンプル</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"/>
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+	<script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+</h:head>
+<h:body>
+    <f:view transient="true">
+    	<ui:repeat value="#{tweetList.list}" var="status">
+    		<i><h:outputText value="#{status.createdAt}"><f:convertDateTime pattern="yyyy年MM月dd日 HH時mm分ss秒" timeZone="JST"/></h:outputText></i>
+			<h:graphicImage url="#{status.user.miniProfileImageURL}"/>
+    		<b>【<h:link value="#{status.user.screenName}">
+    			<f:param id="fname" name="userID" value="#{status.user.screenName}"/>
+    		</h:link></b>
+    		&nbsp;from <small><h:outputText value="#{status.source}" escape="false"/></small>
+    		<b>】</b>&nbsp;
+			<h:outputText value="#{tweetList.formatFor(status)}" escape="false"/>
+	    	<br/>
+		</ui:repeat>
+    	<h:form>
+	    	<h:inputText id="word" value="#{tweetList.text}" type="text" class="form-control"/>
+        	<h:commandButton class="btn btn-primary btn-lg btn-block" id="buttonId" value="送信" action="#{tweetList.send}" />
+	    </h:form>
+    </f:view>
+</h:body>
+</html>
