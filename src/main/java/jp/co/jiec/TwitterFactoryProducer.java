@@ -21,10 +21,10 @@ public class TwitterFactoryProducer {
 			System.setProperty("twitter4j.http.useSSL","false"); 
 			ConfigurationBuilder cb = new ConfigurationBuilder();
 			cb.setDebugEnabled(true)
-			  .setOAuthConsumerKey("O6qaM2V26FSqe8kwFt57s4U5J")
-			  .setOAuthConsumerSecret("MOV9K9nHRX0xJXieJSRV6XaU5qVFZjWOWui2GblSm4UsK3CKB6")
-			  .setOAuthAccessToken("137517621-8NyP7ovNPCF3eNPNDmwq5yo9tkB4HBDQNcxWkNz6")
-			  .setOAuthAccessTokenSecret("83Zj6zpRn3ZtLXu1RjTxleYGKMYgfmv09u5z4HWYQHgSA");
+			  .setOAuthConsumerKey("")
+			  .setOAuthConsumerSecret("")
+			  .setOAuthAccessToken("")
+			  .setOAuthAccessTokenSecret("");
 			tf = new TwitterFactory(cb.build());
 		}
 		return tf;
