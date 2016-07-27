@@ -123,7 +123,7 @@ public class TweetList implements Serializable {
 		return toURLString(origin, url, url);
 	}
 	private String toURLString(String origin, String target, String url){
-		return origin.replaceAll(target, "&nbsp;<a href=\"" + url + "\">"+ target + "</a>");
+		return origin.replaceAll(target, "&nbsp;<a target=\"_blank\" href=\"" + url + "\">"+ target + "</a>");
 	}
 	public String formatFor(Status status) throws UnsupportedEncodingException{
 		String result = status.getText().replaceFirst(" +[A-z0-9\\:\\/\\#\\.]*… ?$", "");
@@ -132,7 +132,7 @@ public class TweetList implements Serializable {
 		}
 		for(HashtagEntity tag : status.getHashtagEntities()){
 			if(!result.contains("#" + tag.getText())){
-				result += "&nbsp;<a href=\"?text=#" + tag.getText() + "\">" + URLEncoder.encode("#" + tag.getText(), "UTF-8") + "</a>";
+				result += "&nbsp;<a target=\"_blank\" href=\"?text=#" + tag.getText() + "\">" + URLEncoder.encode("#" + tag.getText(), "UTF-8") + "</a>";
 			}else{
 				result = toURLString(result, "#" + tag.getText(), "?text=" + URLEncoder.encode("#" + tag.getText(), "UTF-8"));
 			}
