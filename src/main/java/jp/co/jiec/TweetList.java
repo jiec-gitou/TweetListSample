@@ -119,35 +119,12 @@ public class TweetList implements Serializable {
 		this.setList(twitter.getUserTimeline(id));
 	}
 	
-	private String toURLString(String origin, String url){
-		return toURLString(origin, url, url);
-	}
-	private String toURLString(String origin, String target, String url){
-		return origin.replaceAll(target, "&nbsp;<a target=\"_blank\" href=\"" + url + "\">"+ target + "</a>");
-	}
 	public String formatFor(Status status) throws UnsupportedEncodingException{
 		String result = status.getText().replaceFirst(" +[A-z0-9\\:\\/\\#\\.]*… ?$", "");
-		for(UserMentionEntity user : status.getUserMentionEntities()){
-			result = toURLString(result, "@" + user.getScreenName(), "?userID=" + user.getScreenName());
-		}
-		for(HashtagEntity tag : status.getHashtagEntities()){
-			if(!result.contains("#" + tag.getText())){
-				result += "&nbsp;<a target=\"_blank\" href=\"?text=#" + tag.getText() + "\">" + URLEncoder.encode("#" + tag.getText(), "UTF-8") + "</a>";
-			}else{
-				result = toURLString(result, "#" + tag.getText(), "?text=" + URLEncoder.encode("#" + tag.getText(), "UTF-8"));
-			}
-		}
+		//FIXME:ツイート文のユーザID文字列「@〜」をリンクにする。URLは「?userID=〜」
+		//FIXME:ツイート文のハッシュタグ文字列「#〜」をリンクにする。URLは「?text=〜」
+		//FIXME:ツイート文に含まれるURLリンクをリンクにする
 		
-		List<URLEntity> urls = new ArrayList<>();
-		Collections.addAll(urls, status.getURLEntities());
-		Collections.addAll(urls, status.getMediaEntities());
-		for(URLEntity entity : urls){
-			if(!result.contains(entity.getURL())){
-				result += "&nbsp;<a href=\"" + entity.getURL() + "\">" + entity.getURL() + "</a>";
-			}else{
-				result = toURLString(result, entity.getURL());
-			}
-		}
 		return result;
 	}
 }
